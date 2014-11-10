@@ -25,7 +25,7 @@ def update(ind):
 
         #self.updater.add_update(self.done_updating) # returns immediately
 	counter += 1
-	ind.set_label(current_beattime(), "right")
+	ind.set_label(current_beattime(), "right") # this value "right" is completely made up, all I know is it can't be None
         # call in UPDATE_TIMEOUT seconds
         updating_timeout = GObject.timeout_add(int(UPDATE_TIMEOUT*1000), lambda: update(ind))
 
