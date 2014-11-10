@@ -21,7 +21,7 @@ def current_beattime():
 	t = float(swisstime.hour) / 24.0
 	t += float(swisstime.minute) / (24.0 * 60.0)
 	t += float(swisstime.second) / (24.0 * 60.0 * 60.0)
-	return 'd{}.{}.{}@{}'.format(normaltime.year % 100, 
+	return 'd{}.{}.{}@{:03d}'.format(normaltime.year % 100, 
 		normaltime.month, normaltime.day, 
 		int(1000 * t))
 
