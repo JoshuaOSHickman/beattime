@@ -1,33 +1,39 @@
 from gi.repository import Gtk, GObject
 from gi.repository import AppIndicator3 as appindicator
-import time
+from datetime import datetime, tzinfo, timedelta
 import os
 
-def menuitem_response(w, buf):
-  print buf
+ONE_HOUR = timedelta(hours = 1)
+NO_DST = timedelta(0)
+class SwissTime(tzinfo):
+	def utcoffset(self, dt):
+		return ONE_HOUR
 
-os.environ['TZ'] = 'Europe/Zurich'
-time.tzset()
+	def tzname(self, dt):
+		return "Europe/Zurich"
+
+	def dst(self, dt):
+		return NO_DST
+
 def current_beattime():
-	swisstime = time.localtime()
-	t = float(swisstime.tm_hour) / 24.0
-	t += float(swisstime.tm_min) / (24.0 * 60.0)
-	t += float(swisstime.tm_sec) / (24.0 * 60.0 * 60.0)
-	return 'd{}.{}.{}@{}'.format(swisstime.tm_year % 100, 
-		swisstime.tm_mon, swisstime.tm_mday, 
+	swisstime = datetime.now(SwissTime())
+	normaltime = datetime.now()
+	t = float(swisstime.hour) / 24.0
+	t += float(swisstime.minute) / (24.0 * 60.0)
+	t += float(swisstime.second) / (24.0 * 60.0 * 60.0)
+	return 'd{}.{}.{}@{}'.format(normaltime.year % 100, 
+		normaltime.month, normaltime.day, 
 		int(1000 * t))
 
 UPDATE_TIMEOUT = .1
 updating_timeout = None
-counter = 0
 def update(ind):
-	global updating_timeout, counter
+	global updating_timeout
         if updating_timeout is not None: 
             GObject.source_remove(updating_timeout)
 
-        #self.updater.add_update(self.done_updating) # returns immediately
-	counter += 1
 	ind.set_label(current_beattime(), "right") # this value "right" is completely made up, all I know is it can't be None
+
         # call in UPDATE_TIMEOUT seconds
         updating_timeout = GObject.timeout_add(int(UPDATE_TIMEOUT*1000), lambda: update(ind))
 
@@ -40,7 +46,7 @@ https://launchpad.net/~indicator-applet-developers/+archive/ubuntu/indicator-cor
 
 and then run
 
-sudo apt-get install gtk2hs-buildtools
+sudo apt-get install gtk2hs-buildtools # there is probably a python specific thing I should use here, but this seemed to work
 
 And then read
 https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
@@ -53,9 +59,8 @@ so then read
 
 http://developer.ubuntu.com/api/devel/ubuntu-13.10/python/AppIndicator3-0.1.html
 
-
-
 """
+
 # so, that application-running was selected from /usr/share/icons, looking for subfolders that had the indicator-messages file, and choosing something else that was less intrusive. Not many "not intrusive" options.
   ind = appindicator.Indicator.new (
                         "beattime",
