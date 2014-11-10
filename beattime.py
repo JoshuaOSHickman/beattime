@@ -13,7 +13,9 @@ def current_beattime():
 	t = float(swisstime.tm_hour) / 24.0
 	t += float(swisstime.tm_min) / (24.0 * 60.0)
 	t += float(swisstime.tm_sec) / (24.0 * 60.0 * 60.0)
-	return '@' + str(int(1000 * t))
+	return 'd{}.{}.{}@{}'.format(swisstime.tm_year % 100, 
+		swisstime.tm_mon, swisstime.tm_mday, 
+		int(1000 * t))
 
 UPDATE_TIMEOUT = .1
 updating_timeout = None
